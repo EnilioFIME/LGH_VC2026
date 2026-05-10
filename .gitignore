@@ -1,0 +1,21 @@
+# Imagenes
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.webp
+*.tiff
+*.tif 
+
+#Carpetas de imagenes
+630DS/630LGH/
+630DS/WC630/
+630DS/WC630_Normalized/
+630DS/R630L/
+
+# PDF
+*.pdf
+
+# ZIP
+*.zip
