@@ -19,3 +19,6 @@
 
 # ZIP
 *.zip
+
+#CSV
+*.csv

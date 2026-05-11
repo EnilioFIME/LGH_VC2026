@@ -3,8 +3,8 @@ from pathlib import Path
 import random
 
 # Usa rutas absolutas para evitar confusiones de dónde se ejecuta el script
-zip_path = Path(r"C:\Users\emili\Downloads\PIA VC\630DS\Images_Courriers.zip")
-output_dir = Path(r"C:\Users\emili\Downloads\PIA VC\630DS\R630L")
+zip_path = Path(r"D:\VC\PIA\630DS\Images_Courriers.zip")
+output_dir = Path(r"D:\VC\PIA\630DS\R630L")
 output_dir.mkdir(parents=True, exist_ok=True)
 
 with zipfile.ZipFile(zip_path, 'r') as z:

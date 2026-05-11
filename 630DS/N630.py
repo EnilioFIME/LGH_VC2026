@@ -136,8 +136,8 @@ def remove_silence(img):
     return img[:, v_dens > 0]
 
 def process_pipeline():
-    base_path = Path(r"C:\Users\emili\Downloads\PIA VC\630DS\WC630")
-    output_path = Path(r"C:\Users\emili\Downloads\PIA VC\630DS\WC630_Normalized")
+    base_path = Path(r"D:\VC\PIA\630DS\WC630")
+    output_path = Path(r"D:\VC\PIA\630DS\WC630_Normalized")
     
     # Obtener todas las imágenes TIFF en subcarpetas
     tiff_files = list(base_path.glob("**/*.tiff"))

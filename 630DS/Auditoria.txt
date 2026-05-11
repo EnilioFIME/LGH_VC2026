@@ -1,0 +1,62 @@
+Palabra
+Eliminadas
+Razón
+
+
+-MONSIEUR	
+-33	
+-Palabra incorrecta, Ruido, Duda, Ruido, Ruido, Duda, Ruido, Palabra incorrecta, Ruido, Ruido, Ruido, Ruido, Ruido, Sale otra palabra, Sale otra palabra, Palabra incorrecta, Sale otra palabra, Ruido, Ruido, Ruido, Duda, Ruido, Ruido, Ruido, Sale otra palabra, Sale otra palabra, Palabra incorrecta, Ruido, Palabra incorrecta, Ruido, Ruido, Sale otra palabra, Ruido, Duda, Palabra incorrecta
+
+
+-SALUTATIONS	
+-18	
+-Sale otra palabra, Ruido, Ruido, Sale otra palabra, Palabra incorrecta, Ruido, Ruido, Palabra incorrecta, Ruido, Ruido, Ruido, Palabra incorrecta, Sale otra palabra, Ruido, Ruido, Ruido, Palabra incorrecta, Palabra incorrecta
+
+
+-MADAME	
+-27	
+-Palabra incorrecta, Duda, Ruido, Ruido, Sale otra palabra, Sale otra palabra, Palabra incorrecta, Duda, Ruido, Palabra incorrecta, Ruido, Ruido, Ruido, Palabra incorrecta, Sale otra palabra, Ruido, Sale otra palabra, Sale otra palabra, Ruido, Ruido, Ruido, Ruido, Sale otra palabra, Ruido, Sale otra palabra, Sale otra palabra, Ruido
+
+
+-LEXPRESSION	
+-10	
+-Palabra incorrecta, Palabra incorrecta, Ruido, Duda, Duda, Palabra incorrecta, Palabra incorrecta, Palabra incorrecta, Ruido, Ruido
+
+
+-COMPTE	
+-5	
+-Ruido, Palabra incorrecta, Ruido, Palabra incorrecta, Ruido
+
+
+-VEUILLEZ	
+-9	
+-Ruido, Ruido, Ruido, Ruido, Palabra incorrecta, Ruido, Sale otra palabra, Palabra incorrecta, Ruido
+
+
+-DAGRÉER	
+-18	
+-Palabra incorrecta, Palabra incorrecta, Duda, Palabra incorrecta, Sale otra palabra, Palabra incorrecta, Ruido, Ruido, Palabra incorrecta, Ruido, Ruido, Ruido, Palabra incorrecta, Ruido, Sale otra palabra, Ruido, Ruido, Ruido
+
+
+-DISTINGUÉES	
+-6	
+-Ruido, Palabra incorrecta, Ruido, Ruido, Ruido, Ruido
+
+
+-DEMANDE	
+-8	
+-Ruido, Ruido, Palabra incorrecta, Palabra incorrecta, Ruido, Palabra incorrecta, Ruido, Ruido
+
+
+-VOULOIR	
+-4	
+-Palabra incorrecta, Ruido, Duda, Palabra incorrecta
+
+
+
+
+
+
+
+
+
