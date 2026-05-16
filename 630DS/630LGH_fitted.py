@@ -46,8 +46,9 @@ def process_lgh():
             for d in [dir_S, dir_Gx, dir_Gy, dir_Mag, dir_Feat]:
                 (d / rel_folder).mkdir(parents=True, exist_ok=True)
 
+            img_inv = cv2.bitwise_not(img)
             #Suavizado Gaussiano
-            smoothed = cv2.GaussianBlur(img, (5, 5), 0).astype(np.float64)
+            smoothed = cv2.GaussianBlur(img_inv, (5, 5), 0).astype(np.float64)
             
             #Gradiantes en direcciones x y para calcular el cambio de intensidad en las direcciones correspondientes
             gx = np.zeros_like(smoothed)
@@ -72,7 +73,7 @@ def process_lgh():
             for x_start in range(w - w_width + 1):
                 x_end = x_start + w_width
                 
-                win_img = img[:, x_start:x_end]
+                win_img = img_inv[:, x_start:x_end]
                 win_mag = mag[:, x_start:x_end]
                 win_ang = ang[:, x_start:x_end]
                 

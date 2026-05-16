@@ -1,11 +1,13 @@
 import numpy as np, pandas as pd, pickle, warnings
+import xml.etree.ElementTree as ET
 from pathlib import Path
-from sklearn.model_selection import KFold
+from sklearn.model_selection import GroupKFold
 from hmmlearn import hmm
 
 warnings.filterwarnings("ignore")          # quitar warnings ruidosos de hmmlearn
 
 FEATURES_DIR = Path(r"D:\VC\PIA\630DS\630LGH\Fitted\630_Features")
+XML_BASE_PATH = Path(r"D:\VC\PIA\630DS\R630L")
 MAX_STATES   = 4        # maximo estados — con ~3 muestras/clase, mas es contraproducente
 N_FOLDS      = 5
 N_ITER       = 30
@@ -13,13 +15,28 @@ MIN_VAR      = 1e-3     # piso de varianza para evitar covarianzas cero
 
 # ─── helpers ───────────────────────────────────────────────────────────────────
 
-def load_sequences(word_class):
-    seqs = []
-    for csv_path in (FEATURES_DIR / word_class).glob("*.csv"):
-        df = pd.read_csv(csv_path, header=None)
-        if len(df) > 0:
-            seqs.append(df.values.astype(np.float64))
-    return seqs
+def get_word_from_filename(filename):
+    """Extrae la palabra real del nombre de los CSVs.
+    Patron: {docID}_L_{line}_{pos}_{WORD}_N.csv -> WORD"""
+    parts = filename.stem.split("_")
+    if len(parts) >= 3 and parts[-1] == "N":
+        return parts[-2]
+    return None
+
+def build_writer_map():
+    """Parsea todos los XMLs y construye un mapeo {docID: writer_name}."""
+    writer_map = {}
+    for xml_path in XML_BASE_PATH.glob("**/*.xml"):
+        try:
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+            writer = root.find("writer")
+            if writer is not None and writer.text:
+                doc_id = xml_path.stem  # e.g. "00036_L"
+                writer_map[doc_id] = writer.text.strip()
+        except Exception:
+            pass
+    return writer_map
 
 def choose_n_states(seqs, max_states=MAX_STATES):
     """Elige n_states seguro: al menos 2 frames por estado, minimo 2 estados."""
@@ -135,33 +152,40 @@ def safe_score(model, seq):
     except:
         return -np.inf
 
-def extract_word_from_class(word_class):
-    """Extrae la palabra real del nombre de los CSVs en la carpeta.
-    Patron: {docID}_L_{line}_{pos}_{WORD}_N.csv -> WORD"""
-    csv_files = list((FEATURES_DIR / word_class).glob("*.csv"))
-    if not csv_files:
-        return word_class  # fallback al nombre de carpeta
-    name = csv_files[0].stem   # e.g. "02121_L_6_1_salutations_N"
-    parts = name.split("_")
-    # Las partes son: [docID, 'L', line, pos, WORD, 'N']
-    # La palabra esta en la penultima posicion (antes de 'N')
-    if len(parts) >= 3 and parts[-1] == "N":
-        return parts[-2]
-    return word_class  # fallback
+# ─── construir mapeo docID → writer ───────────────────────────────────────────
+writer_map = build_writer_map()
+print(f"Writers parseados: {len(writer_map)} documentos, {len(set(writer_map.values()))} autores únicos")
 
-# ─── cargar datos ──────────────────────────────────────────────────────────────
+# Recopilar todos los datos
+all_seqs_temp = []
+all_words_temp = []
+all_groups_temp = []
 
-classes = [d.name for d in FEATURES_DIR.iterdir() if d.is_dir()]
-# Mapeo: nombre de carpeta -> palabra real
-class_words = [extract_word_from_class(cls) for cls in classes]
-print(f"Palabras unicas: {sorted(set(class_words))}")
+print("Cargando datos desde CSVs...")
+for csv_path in FEATURES_DIR.glob("**/*.csv"):
+    word = get_word_from_filename(csv_path)
+    if not word:
+        continue
+    
+    doc_id = csv_path.parent.name
+    writer = writer_map.get(doc_id, f"unknown_{doc_id}")
+    
+    df = pd.read_csv(csv_path, header=None)
+    if len(df) > 0:
+        all_seqs_temp.append(df.values.astype(np.float64))
+        all_words_temp.append(word)
+        all_groups_temp.append(writer)
 
-all_seqs, all_labels = [], []
-for label, cls in enumerate(classes):
-    for seq in load_sequences(cls):
-        all_seqs.append(seq)
-        all_labels.append(label)
-all_labels = np.array(all_labels)
+# Construir diccionario de clases únicas (alfabético)
+class_words = sorted(set(all_words_temp))
+word_to_label = {w: i for i, w in enumerate(class_words)}
+classes = class_words  # Para compatibilidad con el resto del script
+
+print(f"Palabras unicas encontradas: {classes}")
+
+all_seqs = all_seqs_temp
+all_labels = np.array([word_to_label[w] for w in all_words_temp])
+all_groups = np.array(all_groups_temp)
 
 print(f"Clases: {len(classes)}, Secuencias totales: {len(all_seqs)}")
 
@@ -171,12 +195,18 @@ label_counts = Counter(all_labels)
 print(f"  Min muestras/clase: {min(label_counts.values())}")
 print(f"  Max muestras/clase: {max(label_counts.values())}")
 print(f"  Promedio: {np.mean(list(label_counts.values())):.1f}")
+writer_counts = Counter(all_groups)
+print(f"  Writers con secuencias: {len(writer_counts)}")
 
 # ─── cross-validation ─────────────────────────────────────────────────────────
 
 fold_accs = []
-for fold, (train_idx, test_idx) in enumerate(KFold(N_FOLDS, shuffle=True, random_state=42).split(all_seqs)):
-    print(f"\n-- Fold {fold+1}/{N_FOLDS} --")
+for fold, (train_idx, test_idx) in enumerate(GroupKFold(n_splits=N_FOLDS).split(all_seqs, groups=all_groups)):
+    print(f"\n-- Fold {fold+1}/{N_FOLDS} (Writer-Independent) --")
+    train_writers = set(all_groups[train_idx])
+    test_writers  = set(all_groups[test_idx])
+    overlap = train_writers & test_writers
+    print(f"  Writers train: {len(train_writers)}, test: {len(test_writers)}, overlap: {len(overlap)}")
     train_seqs   = [all_seqs[i] for i in train_idx]
     train_labels = all_labels[train_idx]
     test_seqs    = [all_seqs[i] for i in test_idx]
